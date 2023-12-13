@@ -42,10 +42,10 @@ def send_to_google_sheets(data, user_id):
 
 
 def sanitize_for_sheet(data):
-    # Разбиваем строку на слова
+    
     words = data.split()
 
-    # Возвращаем первое и второе слова
+    
     return words[0], words[3]
 
 def log_error(error_message, data):
@@ -75,7 +75,6 @@ def handle_callback_query(call):
         if call.data == 'premium':
             bot.answer_callback_query(call.id, 'Выбран: Премиум кальян')
             bot.send_message(call.message.chat.id, 'Сколько грамм:')
-            # Добавляем пользователя в список ожидающих ввода
             user_input[call.message.chat.id] = {'type': 'premium'}
         elif call.data == 'national':
             bot.answer_callback_query(call.id, 'Выбран: Национальный кальян')
@@ -102,14 +101,11 @@ def handle_user_input(message):
         chat_id = message.chat.id
 
         if chat_id in user_input:
-            # Пользователь ожидает ввод грамм
             grams = message.text
             shisha_type = user_input[chat_id]['type']
             user_id = message.from_user.id
             bot.send_message(chat_id, f'Ты заказал {grams} грамм {shisha_type} кальяна.')
             send_to_google_sheets(f'{shisha_type.capitalize()} кальян - {grams} грамм', user_id)
-
-            # Убираем пользователя из списка ожидающих ввода
             user_input.pop(chat_id)
     except Exception as e:
         bot.send_message(ADMIN_CHAT_ID, f'Произошла ошибка: {str(e)}')
